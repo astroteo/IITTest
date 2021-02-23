@@ -1,0 +1,23 @@
+
+1. install Fast-DDS following instruction here: https://github.com/eProsima/Fast-DDS 
+
+2. configure Fast-DDS-Gen: 
+	install java and gradle 
+	cd Fast-DDS-Gen
+	gradle assemble
+
+3. Use the code-gen script to generate the Message+Topic types: 
+
+cd src/XXX
+../../../Fast-DDS-Gen/scripts/fastrtpsgen XXX.idl
+
+4. compile with cmake toolchain
+
+	mkdir build
+	cd build
+	cmake ..
+	make 
+
+##############################################################
+
+Very good tutorial: https://fast-dds.docs.eprosima.com/en/latest/fastdds/getting_started/simple_app/simple_app.html

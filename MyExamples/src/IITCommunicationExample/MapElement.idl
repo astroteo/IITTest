@@ -1,0 +1,6 @@
+struct MapElement
+{
+    unsigned long idx;//msg index
+    string key;
+    double value; 
+};
