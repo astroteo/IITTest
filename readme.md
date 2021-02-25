@@ -15,7 +15,7 @@ This excercise templates the hello-world example from the original DDS-exproxima
 
 
 ### compile
-
+cd MyExamples <br>
 mkdir build<br>
 cd build<br>
 cmake ..<br>
