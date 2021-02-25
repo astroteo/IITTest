@@ -1,4 +1,5 @@
 #include "MapElementPubSubTypes.h"
+#include "helpers.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -8,8 +9,11 @@
 #include <fastdds/dds/subscriber/DataReaderListener.hpp>
 #include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
 #include <fastdds/dds/subscriber/SampleInfo.hpp>
+#include <map>
+
 
 using namespace eprosima::fastdds::dds;
+
 
 class MapElementSubscriber
 {
@@ -24,6 +28,7 @@ private:
     Topic* topic_;
 
     TypeSupport type_;
+
 
     class SubListener : public DataReaderListener
     {
@@ -57,26 +62,56 @@ private:
             }
         }
 
+        
+      
+
         void on_data_available(
                 DataReader* reader) override
         {
+        
+            // receive stream
             SampleInfo info;
             if (reader->take_next_sample(&map_element_, &info) == ReturnCode_t::RETCODE_OK)
             {
                 if (info.valid_data)
                 {
-                    samples_++;
-                    std::cout << "key: " << map_element_.key() 
-                              << "value: " << map_element_.value()
-                               << " with index: " << map_element_.idx()
-                                << " RECEIVED." << std::endl;
+                    if(map_element_.key() == "Single-Init-Message" && map_element_.value()==0.0)
+                    {
+                      std::cout << "key: " << map_element_.key()   
+                                << " value: " << map_element_.value() 
+                                << std::endl
+                                << "Single message received, streaming started..." 
+                                <<std::endl;
+                    }
+                    else
+                    {  
+
+                        samples_++;
+                        std::cout << "key: " << map_element_.key() 
+                                  << " value: " << map_element_.value()
+                                  << " t-received: " << millis()
+                                  << " t-sent: " << map_element_.tstamp() 
+                                  << " latency[ns]: " << millis() - map_element_.tstamp()
+                                  << " RECEIVED." << std::endl;
+
+                        performances_[map_element_.key()] =  millis() - map_element_.tstamp();
+                    }
                 }
             }
+        }
+
+        //! Getter for the perfomances map
+        std::map<std::string,double> get_performances_map()
+        {
+            return performances_;
         }
 
         MapElement map_element_;
 
         std::atomic_int samples_;
+
+        std::map <std::string,double> performances_;
+
 
     } listener_;
 
@@ -154,10 +189,32 @@ public:
     void run(
         uint32_t samples)
     {
+
         while(listener_.samples_ < samples)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+
         }
+    }
+
+    //! Recap performances:
+    void recap()
+    {
+        std::cout << "summarizing performances..." <<std::endl;
+        std::map<std::string,double> performances = listener_.get_performances_map();
+
+        double tot_lat =0;
+        int cnt =0;
+        for(auto pe : performances)
+        {
+            cnt++;
+            std::cout<< pe.first << " : " <<pe.second << std::endl;
+            tot_lat += pe.second;
+        }
+
+        std::cout << "average latency: " << tot_lat/cnt <<  " [ns] " <<std::endl;
+
+
     }
 };
 
@@ -172,6 +229,7 @@ int main(
     if(example_sub->init())
     {
         example_sub->run(static_cast<uint32_t>(samples));
+        example_sub->recap();
     }
 
     delete example_sub;

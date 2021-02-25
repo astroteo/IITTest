@@ -1,4 +1,5 @@
 #include "MapElementPubSubTypes.h"
+#include "helpers.h"
 
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
@@ -12,6 +13,7 @@
 #include <stdlib.h>
 
 using namespace eprosima::fastdds::dds;
+
 
 class MapElementPublisher
 {
@@ -99,7 +101,7 @@ public:
     //!Initialize the publisher
     bool init()
     {
-        map_el_.idx(0);
+        map_el_.tstamp(0);
         map_el_.key("start");
         map_el_.value(.0);
 
@@ -141,14 +143,32 @@ public:
         return true;
     }
 
-    //!Send a publication
-    bool publish()
+
+    //Send single message
+    bool publish_single()
+    {   
+        
+        if(listener_.matched_>0)
+        {
+            map_el_.tstamp(millis());
+            map_el_.key("Single-Init-Message");
+            map_el_.value((double) 0.0);
+            writer_->write(&map_el_);
+            return true;
+        }
+        
+
+        return false;
+    }
+
+    //Stream messages
+    bool publish_stream(int sample)
     {
         if (listener_.matched_ > 0)
         {
-            map_el_.idx(map_el_.idx() + 1);// Increase idx by +1
-            map_el_.key("msg=>"+std::to_string(map_el_.idx()));// change msg key
-            map_el_.value((double) (rand() %100));// create random number<<
+            map_el_.tstamp(millis());// include timestamp in the msg
+            map_el_.key("msg=>"+std::to_string(sample));// change msg key
+            map_el_.value((double) (rand() %100));// create random number
             writer_->write(&map_el_);
             return true;
         }
@@ -159,15 +179,26 @@ public:
     void run(
             uint32_t samples)
     {
+
+        // send single message
+        bool ret = false;
+        while(!ret)
+        {
+            ret = publish_single();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        }
+       
+
+        // stream multiple messages
         uint32_t samples_sent = 0;
         while (samples_sent < samples)
         {
-            if (publish())
+            if (publish_stream(samples_sent))
             {
                 samples_sent++;
                 std::cout << "key: " << map_el_.key() 
-                          << "value" << map_el_.value()
-                          << "with index: " << map_el_.idx()
+                          << " value: " << map_el_.value()
+                          << " @time: " << map_el_.tstamp()
                           << " SENT" << std::endl;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));

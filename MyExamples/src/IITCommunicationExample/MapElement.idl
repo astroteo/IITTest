@@ -1,6 +1,7 @@
 struct MapElement
 {
-    unsigned long idx;//msg index
-    string key;
-    double value; 
+    
+    string key;//message key
+    double value; // msg value
+    double tstamp;//msg timestamp 
 };

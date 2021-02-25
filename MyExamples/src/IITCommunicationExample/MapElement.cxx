@@ -34,12 +34,12 @@ using namespace eprosima::fastcdr::exception;
 
 MapElement::MapElement()
 {
-    // m_idx com.eprosima.idl.parser.typecode.PrimitiveTypeCode@1060b431
-    m_idx = 0;
-    // m_key com.eprosima.idl.parser.typecode.StringTypeCode@612679d6
+    // m_key com.eprosima.idl.parser.typecode.StringTypeCode@76a3e297
     m_key ="";
-    // m_value com.eprosima.idl.parser.typecode.PrimitiveTypeCode@11758f2a
+    // m_value com.eprosima.idl.parser.typecode.PrimitiveTypeCode@4d3167f4
     m_value = 0.0;
+    // m_tstamp com.eprosima.idl.parser.typecode.PrimitiveTypeCode@ed9d034
+    m_tstamp = 0.0;
 
 }
 
@@ -52,24 +52,24 @@ MapElement::~MapElement()
 
 MapElement::MapElement(const MapElement &x)
 {
-    m_idx = x.m_idx;
     m_key = x.m_key;
     m_value = x.m_value;
+    m_tstamp = x.m_tstamp;
 }
 
 MapElement::MapElement(MapElement &&x)
 {
-    m_idx = x.m_idx;
     m_key = std::move(x.m_key);
     m_value = x.m_value;
+    m_tstamp = x.m_tstamp;
 }
 
 MapElement& MapElement::operator=(const MapElement &x)
 {
 
-    m_idx = x.m_idx;
     m_key = x.m_key;
     m_value = x.m_value;
+    m_tstamp = x.m_tstamp;
 
     return *this;
 }
@@ -77,9 +77,9 @@ MapElement& MapElement::operator=(const MapElement &x)
 MapElement& MapElement::operator=(MapElement &&x)
 {
 
-    m_idx = x.m_idx;
     m_key = std::move(x.m_key);
     m_value = x.m_value;
+    m_tstamp = x.m_tstamp;
 
     return *this;
 }
@@ -89,10 +89,10 @@ size_t MapElement::getMaxCdrSerializedSize(size_t current_alignment)
     size_t initial_alignment = current_alignment;
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + 255 + 1;
+
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+
 
     current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
@@ -107,10 +107,10 @@ size_t MapElement::getCdrSerializedSize(const MapElement& data, size_t current_a
     size_t initial_alignment = current_alignment;
 
 
-    current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4);
-
-
     current_alignment += 4 + eprosima::fastcdr::Cdr::alignment(current_alignment, 4) + data.key().size() + 1;
+
+    current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
+
 
     current_alignment += 8 + eprosima::fastcdr::Cdr::alignment(current_alignment, 8);
 
@@ -122,44 +122,17 @@ size_t MapElement::getCdrSerializedSize(const MapElement& data, size_t current_a
 void MapElement::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
 
-    scdr << m_idx;
     scdr << m_key;
     scdr << m_value;
+    scdr << m_tstamp;
 }
 
 void MapElement::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
 
-    dcdr >> m_idx;
     dcdr >> m_key;
     dcdr >> m_value;
-}
-
-/*!
- * @brief This function sets a value in member idx
- * @param _idx New value for member idx
- */
-void MapElement::idx(uint32_t _idx)
-{
-m_idx = _idx;
-}
-
-/*!
- * @brief This function returns the value of member idx
- * @return Value of member idx
- */
-uint32_t MapElement::idx() const
-{
-    return m_idx;
-}
-
-/*!
- * @brief This function returns a reference to member idx
- * @return Reference to member idx
- */
-uint32_t& MapElement::idx()
-{
-    return m_idx;
+    dcdr >> m_tstamp;
 }
 
 /*!
@@ -222,6 +195,33 @@ double MapElement::value() const
 double& MapElement::value()
 {
     return m_value;
+}
+
+/*!
+ * @brief This function sets a value in member tstamp
+ * @param _tstamp New value for member tstamp
+ */
+void MapElement::tstamp(double _tstamp)
+{
+m_tstamp = _tstamp;
+}
+
+/*!
+ * @brief This function returns the value of member tstamp
+ * @return Value of member tstamp
+ */
+double MapElement::tstamp() const
+{
+    return m_tstamp;
+}
+
+/*!
+ * @brief This function returns a reference to member tstamp
+ * @return Reference to member tstamp
+ */
+double& MapElement::tstamp()
+{
+    return m_tstamp;
 }
 
 
