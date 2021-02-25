@@ -1,7 +1,7 @@
 
-### IIT Test assessment as "robotic software engineer"
+## IIT Test assessment as "robotic software engineer"
 
-## intro:
+### intro:
 
 This excercise templates the hello-world example from the original DDS-exproxima repository.<br>
 
@@ -9,17 +9,20 @@ This excercise templates the hello-world example from the original DDS-exproxima
  Two single processes are assumed in the canonical publisher/subscriber paradigm where a custom message has been created (MapElemet.idl --> automatic code-gen has been than used for generating the message and topic code)
 
 
-## compile
+### compile
 
-mkdir build
-cd build
-cmake ..
-make 
+mkdir build<br>
+cd build<br>
+cmake ..<br>
+make <br>
 
 two executables will be generated.
 
-## run
+### run
 
 1. open a terminal and run: ./MapElementSubscriber
 2. open a second terminal and run: ./MapElementPublisher
+
+
+ I thank you in advance for the time spent reviewing my test.
 
